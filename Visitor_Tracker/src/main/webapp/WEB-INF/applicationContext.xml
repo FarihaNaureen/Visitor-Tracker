@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       https://www.springframework.org/schema/beans/spring-beans.xsd
+
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+
+       http://www.springframework.org/schema/tx
+       https://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- Scan Packages -->
+    <context:component-scan
+            base-package="com.visitortracker"/>
+
+    <!-- ========================= -->
+    <!-- MYSQL DATASOURCE CONFIG -->
+    <!-- ========================= -->
+
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+        <!-- MySQL Driver -->
+        <property name="driverClassName"
+                  value="com.mysql.cj.jdbc.Driver"/>
+
+        <!-- Database URL -->
+        <property name="url"
+                  value="jdbc:mysql://localhost:3306/visitor_tracker?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
+
+        <!-- MySQL Username -->
+        <property name="username"
+                  value="root"/>
+
+        <!-- MySQL Password -->
+        <property name="password"
+                  value="08115"/>
+
+    </bean>
+
+    <!-- ========================= -->
+    <!-- HIBERNATE CONFIG -->
+    <!-- ========================= -->
+
+    <bean id="jpaVendorAdapter"
+          class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+
+        <property name="databasePlatform"
+                  value="org.hibernate.dialect.MySQL8Dialect"/>
+
+        <property name="showSql"
+                  value="true"/>
+
+        <property name="generateDdl"
+                  value="true"/>
+
+    </bean>
+
+    <!-- ========================= -->
+    <!-- ENTITY MANAGER FACTORY -->
+    <!-- ========================= -->
+
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+
+        <property name="dataSource"
+                  ref="dataSource"/>
+
+        <property name="jpaVendorAdapter"
+                  ref="jpaVendorAdapter"/>
+
+        <!-- Entity Package -->
+        <property name="packagesToScan"
+                  value="com.visitortracker.model"/>
+
+        <property name="jpaProperties">
+
+            <props>
+
+                <!-- Auto create/update tables -->
+                <prop key="hibernate.hbm2ddl.auto">
+                    update
+                </prop>
+
+                <!-- Show SQL -->
+                <prop key="hibernate.show_sql">
+                    true
+                </prop>
+
+                <!-- Format SQL -->
+                <prop key="hibernate.format_sql">
+                    true
+                </prop>
+
+            </props>
+
+        </property>
+
+    </bean>
+
+    <!-- ========================= -->
+    <!-- TRANSACTION MANAGER -->
+    <!-- ========================= -->
+
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager">
+
+        <property name="entityManagerFactory"
+                  ref="entityManagerFactory"/>
+
+    </bean>
+
+    <!-- Enable Annotation Transactions -->
+    <tx:annotation-driven
+            transaction-manager="transactionManager"/>
+
+</beans>
